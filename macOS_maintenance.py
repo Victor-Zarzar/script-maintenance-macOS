@@ -3,70 +3,87 @@ import subprocess
 import shutil
 from pathlib import Path
 
-def run_command(command, use_sudo=False, ignore_errors=False):
-    """Executa comando com tratamento de erro melhorado"""
+def run_command(command, use_sudo=False, ignore_errors=False, input_text=None):
+    """Executa comando com tratamento de erro"""
     try:
         if use_sudo:
             command = f"sudo {command}"
-        result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+        
+        if input_text:
+            result = subprocess.run(
+                command, 
+                shell=True, 
+                check=True, 
+                capture_output=True, 
+                text=True,
+                input=input_text
+            )
+        else:
+            result = subprocess.run(
+                command, 
+                shell=True, 
+                check=True, 
+                capture_output=True, 
+                text=True,
+                timeout=30
+            )
         return True, result.stdout
+    except subprocess.TimeoutExpired:
+        if not ignore_errors:
+            print(f"  ⏱️ Timeout ao executar: {command}")
+        return False, "Timeout"
     except subprocess.CalledProcessError as e:
         if not ignore_errors:
-            print(f"⚠️ Erro ao executar: {command}\n{e}")
+            print(f"  ⚠️ Erro ao executar: {command}\n  {e}")
         return False, e.stderr
     except Exception as e:
         if not ignore_errors:
-            print(f"⚠️ Erro inesperado: {e}")
+            print(f"  ⚠️ Erro inesperado: {e}")
         return False, str(e)
 
 def update_system():
     """Atualiza sistema e Homebrew"""
-    print("🔄 Atualizando o sistema e Homebrew...")
+    print("Atualizando o sistema e Homebrew...")
     
-    print("  📱 Verificando atualizações do macOS...")
-    run_command("softwareupdate -l")
-    run_command("softwareupdate -i -a", ignore_errors=True)
+    print("  Verificando atualizações do macOS...")
+    run_command("softwareupdate -l", ignore_errors=True)
     
     success, _ = run_command("which brew", ignore_errors=True)
     if success:
-        print("  🍺 Atualizando Homebrew...")
-        run_command("brew update")
-        run_command("brew upgrade")
-        run_command("brew cleanup")
-        run_command("brew autoremove")
+        print("  Atualizando Homebrew...")
+        run_command("brew update", ignore_errors=True)
+        run_command("brew upgrade", ignore_errors=True)
+        run_command("brew cleanup", ignore_errors=True)
+        run_command("brew autoremove", ignore_errors=True)
         run_command("brew doctor", ignore_errors=True)
     else:
-        print("  ℹ️ Homebrew não encontrado, pulando...")
+        print("  Homebrew não encontrado, pulando...")
 
 def clean_software_update_cache():
-    """Limpa cache de atualizações de software - NOVA FUNCIONALIDADE"""
-    print("🔄 Limpando cache de atualizações de software...")
+    """Limpa cache de atualizações de software"""
+    print("Limpando cache de atualizações de software...")
     
     software_update_paths = [
         "/Library/Updates",
-        "/System/Library/CoreServices/Software Update.app/Contents/Resources/SUUpdatesCatalog.gz",
-        "/var/folders/*/C/com.apple.SoftwareUpdate",
         "~/Library/Caches/com.apple.SoftwareUpdate",
         "/Library/Caches/com.apple.SoftwareUpdate"
     ]
     
     for path in software_update_paths:
         expanded_path = os.path.expanduser(path)
-        if "*" in expanded_path:
-            run_command(f"rm -rf {expanded_path}", use_sudo=True, ignore_errors=True)
-        elif os.path.exists(expanded_path):
+        if os.path.exists(expanded_path):
             try:
                 if os.path.isdir(expanded_path):
                     shutil.rmtree(expanded_path, ignore_errors=True)
                 else:
                     os.remove(expanded_path)
-                print(f"  ✅ Removido: {expanded_path}")
+                print(f"  Removido: {expanded_path}")
             except PermissionError:
                 run_command(f"rm -rf '{expanded_path}'", use_sudo=True, ignore_errors=True)
 
 def clean_xcode_build_cache():
     """Limpa cache de builds do Xcode"""
-    print("🔨 Limpando cache de builds do Xcode...")
+    print("Limpando cache de builds do Xcode...")
     
     xcode_paths = [
         "~/Library/Developer/Xcode/DerivedData",
@@ -84,7 +101,8 @@ def clean_xcode_build_cache():
                 if os.path.isdir(expanded_path):
                     size = get_folder_size(expanded_path)
                     shutil.rmtree(expanded_path, ignore_errors=True)
-                    print(f"  ✅ Removido {format_bytes(size)}: {path}")
+                    if size > 0:
+                        print(f"  Removido {format_bytes(size)}: {path}")
                 else:
                     os.remove(expanded_path)
             except PermissionError:
@@ -92,7 +110,7 @@ def clean_xcode_build_cache():
 
 def clean_ios_simulator_cache():
     """Limpa cache do simulador iOS"""
-    print("📱 Limpando cache do Simulador iOS...")
+    print("Limpando cache do Simulador iOS...")
     
     simulator_paths = [
         "~/Library/Developer/CoreSimulator/Devices",
@@ -108,38 +126,169 @@ def clean_ios_simulator_cache():
             try:
                 size = get_folder_size(expanded_path)
                 shutil.rmtree(expanded_path, ignore_errors=True)
-                print(f"  ✅ Removido {format_bytes(size)}: {path}")
+                if size > 0:
+                    print(f"  Removido {format_bytes(size)}: {path}")
             except Exception as e:
-                print(f"  ⚠️ Erro ao remover {path}: {e}")
+                print(f"  Erro ao remover {path}: {e}")
+
+def clean_nvm_npm_cache():
+    """Limpa cache do nvm e npm"""
+    print("📦 Limpando cache do nvm/npm...")
+    
+    nvm_dir = os.path.expanduser("~/.nvm")
+    if os.path.exists(nvm_dir):
+        npm_cache_path = os.path.expanduser("~/.npm")
+        if os.path.exists(npm_cache_path):
+            size = get_folder_size(npm_cache_path)
+            if size > 0:
+                print(f"  📊 Tamanho do cache npm: {format_bytes(size)}")
+            try:
+                shutil.rmtree(npm_cache_path, ignore_errors=True)
+                print("  ✅ Cache npm removido")
+            except Exception as e:
+                print(f"  ⚠️ Erro ao remover cache npm: {e}")
+        
+        nvm_cache_paths = [
+            "~/.nvm/.cache"
+        ]
+        
+        for path in nvm_cache_paths:
+            expanded_path = os.path.expanduser(path)
+            if os.path.exists(expanded_path):
+                try:
+                    size = get_folder_size(expanded_path)
+                    shutil.rmtree(expanded_path, ignore_errors=True)
+                    if size > 0:
+                        print(f"  ✅ Removido {format_bytes(size)}: {path}")
+                except Exception:
+                    pass
+        
+        success, _ = run_command("npm cache clean --force", ignore_errors=True)
+        if success:
+            run_command("npm cache verify", ignore_errors=True)
+        
+        print("  ✅ Cache do nvm/npm limpo")
+    else:
+        print("  ℹ️ nvm não encontrado, pulando...")
+
+def clean_pnpm_cache():
+    """Limpa cache do pnpm"""
+    print("📦 Limpando cache do pnpm...")
+    
+    success, _ = run_command("which pnpm", ignore_errors=True)
+    if success:
+        pnpm_paths = [
+            "~/.pnpm-store",
+            "~/Library/pnpm/store",
+            "~/.local/share/pnpm/store"
+        ]
+        
+        total_size = 0
+        for path in pnpm_paths:
+            expanded_path = os.path.expanduser(path)
+            if os.path.exists(expanded_path):
+                size = get_folder_size(expanded_path)
+                total_size += size
+        
+        if total_size > 0:
+            print(f"  📊 Tamanho do cache pnpm: {format_bytes(total_size)}")
+        
+        run_command("pnpm store prune", ignore_errors=True)
+        print("  ✅ Cache do pnpm limpo")
+    else:
+        print("  ℹ️ pnpm não encontrado, pulando...")
+
+def clean_dart_flutter_cache():
+    """Limpa cache do Dart, Flutter e FVM"""
+    print("🎯 Limpando cache do Dart/Flutter/FVM...")
+    
+    success, _ = run_command("which flutter", ignore_errors=True)
+    if success:
+        flutter_cache_path = os.path.expanduser("~/.flutter")
+        if os.path.exists(flutter_cache_path):
+            size = get_folder_size(flutter_cache_path)
+            if size > 0:
+                print(f"  📊 Tamanho do cache Flutter: {format_bytes(size)}")
+        
+        flutter_clean_paths = [
+            "~/.flutter-devtools",
+            "~/.flutter/bin/cache"
+        ]
+        
+        for path in flutter_clean_paths:
+            expanded_path = os.path.expanduser(path)
+            if os.path.exists(expanded_path):
+                try:
+                    shutil.rmtree(expanded_path, ignore_errors=True)
+                except Exception:
+                    pass
+        
+        print("  🔄 Limpando pub cache...")
+        run_command("echo 'y' | flutter pub cache clean", ignore_errors=True)
+        
+        run_command("flutter pub cache repair", ignore_errors=True)
+        
+        print("  ✅ Cache do Flutter limpo")
+    else:
+        print("  ℹ️ Flutter não encontrado")
+    
+    dart_cache_paths = [
+        "~/.pub-cache/hosted/*/cache",
+        "~/Library/Application Support/dart",
+        "~/.dart",
+        "~/.dartServer"
+    ]
+    
+    total_dart_size = 0
+    for path in dart_cache_paths:
+        expanded_path = os.path.expanduser(path)
+        if "*" in path:
+            run_command(f"find {os.path.dirname(os.path.expanduser(path))} -path '*cache' -type d -exec rm -rf {{}} + 2>/dev/null", ignore_errors=True)
+        elif os.path.exists(expanded_path):
+            size = get_folder_size(expanded_path)
+            total_dart_size += size
+            try:
+                shutil.rmtree(expanded_path, ignore_errors=True)
+            except Exception:
+                pass
+    
+    if total_dart_size > 0:
+        print(f"  📊 Cache Dart removido: {format_bytes(total_dart_size)}")
+    
+    success, _ = run_command("which dart", ignore_errors=True)
+    if success:
+        run_command("dart pub cache repair", ignore_errors=True)
+        print("  ✅ Cache do Dart limpo")
+    
+    success, _ = run_command("which fvm", ignore_errors=True)
+    if success:
+        fvm_cache_path = os.path.expanduser("~/fvm/versions")
+        if os.path.exists(fvm_cache_path):
+            size = get_folder_size(fvm_cache_path)
+            if size > 0:
+                print(f"  📊 Tamanho do cache FVM: {format_bytes(size)}")
+        
+        print("  💡 FVM: use 'fvm remove <version>' para remover versões específicas")
+        print("  ✅ FVM verificado")
+    else:
+        print("  ℹ️ FVM não encontrado")
 
 def clean_caches():
     """Limpa caches do sistema"""
     print("🧹 Limpando caches do sistema...")
     
     cache_paths = [
-    
         "~/Library/Caches",
         "~/Library/Application Support/CrashReporter",
         "~/Library/Logs",
-        "~/Library/Saved Application State",
-        "/Library/Caches",
-        "/System/Library/Caches",
-        "/var/folders/*/*/C/*",
-        "~/Library/Caches/com.apple.akd",
-        "~/Library/Caches/com.apple.appstore",
-        "~/Library/Caches/com.apple.Safari",
-        "~/Library/Safari/LocalStorage",
-        "~/Library/Safari/Databases"
+        "~/Library/Saved Application State"
     ]
     
     total_cleaned = 0
     
     for path in cache_paths:
         expanded_path = os.path.expanduser(path)
-        if "*" in expanded_path:
-            success, _ = run_command(f"du -sh {expanded_path} 2>/dev/null | awk '{{sum += $1}} END {{print sum}}'", ignore_errors=True)
-            run_command(f"rm -rf {expanded_path}", use_sudo=True, ignore_errors=True)
-        elif os.path.exists(expanded_path):
+        if os.path.exists(expanded_path):
             try:
                 size = get_folder_size(expanded_path)
                 total_cleaned += size
@@ -162,8 +311,11 @@ def clean_caches():
                     
             except PermissionError:
                 run_command(f"rm -rf '{expanded_path}'", use_sudo=True, ignore_errors=True)
+            except Exception:
+                pass
     
-    print(f"  ✅ Total de cache limpo: {format_bytes(total_cleaned)}")
+    if total_cleaned > 0:
+        print(f"  ✅ Total de cache limpo: {format_bytes(total_cleaned)}")
 
 def clean_downloads_and_trash():
     """Limpa Downloads antigos e Lixeira"""
@@ -181,37 +333,30 @@ def clean_logs():
     print("🗂 Limpando logs antigos...")
     
     log_paths = [
-        "~/Library/Logs",
-        "/var/log",
-        "/Library/Logs",
-        "~/Library/Containers/*/Data/Library/Logs",
-        "/private/var/log/asl/*.asl"
+        "~/Library/Logs"
     ]
-    
-    run_command("sudo log config --mode 'level:info,persist:debug' --subsystem com.apple.system", ignore_errors=True)
     
     for path in log_paths:
         expanded_path = os.path.expanduser(path)
-        if "*" in expanded_path:
-            run_command(f"find {os.path.dirname(expanded_path)} -name '{os.path.basename(expanded_path)}' -mtime +7 -delete", use_sudo=True, ignore_errors=True)
-        elif os.path.exists(expanded_path):
+        if os.path.exists(expanded_path):
             try:
-                run_command(f"find '{expanded_path}' -name '*.log' -mtime +7 -delete", use_sudo=True, ignore_errors=True)
-                run_command(f"find '{expanded_path}' -name '*.asl' -mtime +7 -delete", use_sudo=True, ignore_errors=True)
-            except Exception as e:
-                print(f"  ⚠️ Erro ao limpar logs em {path}: {e}")
+                run_command(f"find '{expanded_path}' -name '*.log' -mtime +7 -delete", ignore_errors=True)
+            except Exception:
+                pass
 
 def optimize_storage():
     """Otimiza armazenamento do macOS"""
     print("💾 Otimizando armazenamento...")
     
-    run_command("sudo tmutil deletelocalsnapshots /", ignore_errors=True)
+    run_command("sudo tmutil deletelocalsnapshots / 2>/dev/null", ignore_errors=True)
     
     photos_cache = "~/Pictures/Photos Library.photoslibrary/resources/caches"
-    if os.path.exists(os.path.expanduser(photos_cache)):
-        size = get_folder_size(os.path.expanduser(photos_cache))
-        run_command(f"rm -rf '{os.path.expanduser(photos_cache)}'", ignore_errors=True)
-        print(f"  ✅ Cache de Fotos limpo: {format_bytes(size)}")
+    expanded_path = os.path.expanduser(photos_cache)
+    if os.path.exists(expanded_path):
+        size = get_folder_size(expanded_path)
+        run_command(f"rm -rf '{expanded_path}'", ignore_errors=True)
+        if size > 0:
+            print(f"  ✅ Cache de Fotos limpo: {format_bytes(size)}")
 
 def check_docker():
     """Limpa Docker"""
@@ -221,12 +366,9 @@ def check_docker():
     if success:
         print("  🐳 Docker encontrado, executando limpeza...")
         
-        run_command("docker stop $(docker ps -q)", ignore_errors=True)
-        
-        run_command("docker system prune -af --volumes")
+        run_command("docker stop $(docker ps -q) 2>/dev/null", ignore_errors=True)
+        run_command("docker system prune -af --volumes", ignore_errors=True)
         run_command("docker builder prune -af", ignore_errors=True)
-        
-        run_command("docker rmi $(docker images -f 'dangling=true' -q)", ignore_errors=True)
         
         print("  ✅ Limpeza do Docker concluída")
     else:
@@ -271,7 +413,10 @@ if __name__ == "__main__":
     update_system()
     clean_software_update_cache()
     clean_xcode_build_cache()  
-    clean_ios_simulator_cache()  
+    clean_ios_simulator_cache()
+    clean_nvm_npm_cache()
+    clean_pnpm_cache()
+    clean_dart_flutter_cache()
     clean_caches()
     clean_downloads_and_trash()  
     clean_logs()
