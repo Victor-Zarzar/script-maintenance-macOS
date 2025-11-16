@@ -4,7 +4,6 @@
 # Advanced macOS Maintenance Script
 # ============================================
 
-# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -13,7 +12,6 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-# Global variables
 TOTAL_CLEANED=0
 LOG_FILE="$HOME/macos_maintenance_$(date +%Y%m%d_%H%M%S).log"
 
@@ -129,11 +127,25 @@ clean_software_update_cache() {
     
     for path in "${paths[@]}"; do
         if [ -d "$path" ]; then
+            if [ -z "$(ls -A "$path" 2>/dev/null)" ]; then
+                print_info "$(basename "$path"): already clean"
+                continue
+            fi
+            
             local size=$(get_folder_size "$path")
-            sudo rm -rf "$path" 2>/dev/null && \
-                print_success "Removed: $(format_bytes $((size * 1024)))" || \
-                print_error "Failed to remove: $path"
+            
+            if [[ "$path" == /Library/* ]]; then
+                sudo rm -rf "$path"/* 2>/dev/null && \
+                    print_success "$(basename "$path"): $(format_bytes $((size * 1024)))" || \
+                    print_warning "$(basename "$path"): no permission or in use"
+            else
+                rm -rf "$path"/* 2>/dev/null && \
+                    print_success "$(basename "$path"): $(format_bytes $((size * 1024)))"
+            fi
+            
             TOTAL_CLEANED=$((TOTAL_CLEANED + size))
+        else
+            print_info "$(basename "$path"): not found"
         fi
     done
     
@@ -474,13 +486,11 @@ run_full_maintenance() {
 # ============================================
 
 main() {
-    # Check if macOS
     if [[ "$OSTYPE" != "darwin"* ]]; then
         print_error "This script is for macOS only!"
         exit 1
     fi
     
-    # Create log file
     touch "$LOG_FILE"
     log_action "Starting maintenance script"
     
