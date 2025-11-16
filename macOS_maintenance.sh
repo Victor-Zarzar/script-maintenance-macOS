@@ -185,6 +185,46 @@ clean_ios_simulator() {
     log_action "iOS Simulator cleaned"
 }
 
+clean_ios_ipsw() {
+    print_section "Cleaning iOS IPSW Files"
+    
+    local ipsw_paths=(
+        "$HOME/Library/iTunes/iPhone Software Updates"
+        "$HOME/Library/iTunes/iPad Software Updates"
+        "$HOME/Library/iTunes/iPod Software Updates"
+        "$HOME/Library/iTunes/Apple TV Software Updates"
+        "$HOME/Library/iTunes/Apple Watch Software Updates"
+    )
+    
+    local total_size=0
+    local files_found=0
+    
+    for path in "${ipsw_paths[@]}"; do
+        if [ -d "$path" ]; then
+            local size=$(get_folder_size "$path")
+            if [ "$size" -gt 0 ]; then
+                local count=$(find "$path" -name "*.ipsw" 2>/dev/null | wc -l)
+                if [ "$count" -gt 0 ]; then
+                    print_info "Found $count IPSW file(s) in $(basename "$(dirname "$path")")"
+                    rm -rf "$path"/*.ipsw 2>/dev/null && \
+                        print_success "Removed: $(format_bytes $((size * 1024)))"
+                    total_size=$((total_size + size))
+                    files_found=$((files_found + count))
+                fi
+            fi
+        fi
+    done
+    
+    if [ "$files_found" -eq 0 ]; then
+        print_info "No IPSW files found"
+    else
+        print_success "Total: $files_found file(s) - $(format_bytes $((total_size * 1024)))"
+        TOTAL_CLEANED=$((TOTAL_CLEANED + total_size))
+    fi
+    
+    log_action "iOS IPSW files cleaned"
+}
+
 clean_nvm_npm() {
     print_section "Cleaning NPM/NVM Cache"
     
@@ -379,15 +419,16 @@ show_menu() {
     echo "3)  Clean update cache"
     echo "4)  Clean Xcode cache"
     echo "5)  Clean iOS simulator"
-    echo "6)  Clean NPM/NVM"
-    echo "7)  Clean PNPM"
-    echo "8)  Clean Flutter/Dart/FVM"
-    echo "9)  Clean system caches"
-    echo "10) Clean downloads and trash"
-    echo "11) Clean old logs"
-    echo "12) Optimize storage"
-    echo "13) Clean Docker"
-    echo "14) View action log"
+    echo "6)  clean iOS firmwares (IPSW)"
+    echo "7)  Clean NPM/NVM"
+    echo "8)  Clean PNPM"
+    echo "9)  Clean Flutter/Dart/FVM"
+    echo "10)  Clean system caches"
+    echo "11) Clean downloads and trash"
+    echo "12) Clean old logs"
+    echo "13) Optimize storage"
+    echo "14) Clean Docker"
+    echo "15) View action log"
     echo "0)  Exit"
     echo ""
     echo -n "Choose an option: "
@@ -403,6 +444,7 @@ run_full_maintenance() {
     clean_software_update_cache
     clean_xcode_cache
     clean_ios_simulator
+    clean_ios_ipsw
     clean_nvm_npm
     clean_pnpm
     clean_flutter_dart
@@ -452,15 +494,16 @@ main() {
             3) clean_software_update_cache ;;
             4) clean_xcode_cache ;;
             5) clean_ios_simulator ;;
-            6) clean_nvm_npm ;;
-            7) clean_pnpm ;;
-            8) clean_flutter_dart ;;
-            9) clean_system_caches ;;
-            10) clean_downloads_trash ;;
-            11) clean_logs ;;
-            12) optimize_storage ;;
-            13) clean_docker ;;
-            14) cat "$LOG_FILE" | less ;;
+            6) clean_ios_ipsw ;;
+            7) clean_nvm_npm ;;
+            8) clean_pnpm ;;
+            9) clean_flutter_dart ;;
+            10) clean_system_caches ;;
+            11) clean_downloads_trash ;;
+            12) clean_logs ;;
+            13) optimize_storage ;;
+            14) clean_docker ;;
+            15) cat "$LOG_FILE" | less ;;
             0) 
                 print_success "Goodbye!"
                 log_action "Script finished"
