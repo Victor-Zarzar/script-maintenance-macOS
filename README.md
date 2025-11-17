@@ -7,8 +7,8 @@ A comprehensive automated maintenance script for macOS that helps clean cache fi
 - System and Homebrew updates
 - Xcode cache cleaning
 - iOS Simulator cleanup
-- Android Studio & Emulator cache cleaning
 - iOS firmware files (IPSW) removal
+- Android Studio & Emulator cache cleaning
 - NPM/NVM cache management
 - PNPM store optimization
 - Flutter/Dart/FVM cache cleaning
@@ -54,8 +54,8 @@ The script will display an interactive menu with the following options:
 3. Clean update cache
 4. Clean Xcode cache
 5. Clean iOS simulator
-6. Clean Android Studio & Emulator
-7. Clean iOS firmwares (IPSW)
+6. Clean iOS firmwares (IPSW)
+7. Clean Android Studio & Emulator
 8. Clean NPM/NVM
 9. Clean PNPM
 10. Clean Flutter/Dart/FVM
@@ -70,18 +70,18 @@ The script will display an interactive menu with the following options:
 
 ### Development Tools
 - **Xcode**: Derived data, archives, and simulator files
-- **Android Studio & Emulator**: AVD caches, build caches, IDE caches, and logs (5-8 GB typically) ⭐ NEW
+- **Android Studio & Emulator**: AVD caches, build caches, IDE caches, and logs (5-8 GB typically)
 - **iOS Simulator**: Simulator data and caches
 
 ### Mobile Development
-- **iOS Firmwares**: IPSW files downloaded by Finder/iTunes (3-8 GB each)
+- **iOS Firmwares**: IPSW files downloaded by Finder/iTunes (3-11 GB each)
 - **Flutter/Dart/FVM**: Development tool caches
-- **Android**: Emulator caches, build caches, and Android Studio logs ⭐ NEW
+- **Android**: Emulator caches, build caches, and Android Studio logs
 
 ### Package Managers
 - **NPM/NVM**: Node package manager caches
 - **PNPM**: Store and cache optimization
-- **Gradle**: Detection and notification (manual cleaning recommended) ⭐ NEW
+- **Gradle**: Detection and notification (manual cleaning recommended)
 
 ### System Maintenance
 - **System Updates**: Software update caches
