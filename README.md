@@ -7,6 +7,7 @@ A comprehensive automated maintenance script for macOS that helps clean cache fi
 - System and Homebrew updates
 - Xcode cache cleaning
 - iOS Simulator cleanup
+- Android Studio & Emulator cache cleaning
 - iOS firmware files (IPSW) removal
 - NPM/NVM cache management
 - PNPM store optimization
@@ -53,27 +54,52 @@ The script will display an interactive menu with the following options:
 3. Clean update cache
 4. Clean Xcode cache
 5. Clean iOS simulator
-6. Clean iOS firmwares (IPSW)
-7. Clean NPM/NVM
-8. Clean PNPM
-9. Clean Flutter/Dart/FVM
-10. Clean system caches
-11. Clean downloads and trash
-12. Clean old logs
-13. Optimize storage
-14. Clean Docker
-15. View action log
+6. Clean Android Studio & Emulator
+7. Clean iOS firmwares (IPSW)
+8. Clean NPM/NVM
+9. Clean PNPM
+10. Clean Flutter/Dart/FVM
+11. Clean system caches
+12. Clean downloads and trash
+13. Clean old logs
+14. Optimize storage
+15. Clean Docker
+16. View action log
 
 ## What Gets Cleaned
 
+### Development Tools
+- **Xcode**: Derived data, archives, and simulator files
+- **Android Studio & Emulator**: AVD caches, build caches, IDE caches, and logs (5-8 GB typically) ⭐ NEW
+- **iOS Simulator**: Simulator data and caches
+
+### Mobile Development
+- **iOS Firmwares**: IPSW files downloaded by Finder/iTunes (3-8 GB each)
+- **Flutter/Dart/FVM**: Development tool caches
+- **Android**: Emulator caches, build caches, and Android Studio logs ⭐ NEW
+
+### Package Managers
+- **NPM/NVM**: Node package manager caches
+- **PNPM**: Store and cache optimization
+- **Gradle**: Detection and notification (manual cleaning recommended) ⭐ NEW
+
+### System Maintenance
 - **System Updates**: Software update caches
-- **Development Tools**: Xcode derived data, archives, and simulator files
-- **iOS Firmwares**: IPSW files downloaded by Finder/iTunes (can be 3-8GB each)
-- **Package Managers**: npm, pnpm cache and stores
-- **Mobile Development**: Flutter, Dart, and FVM caches
 - **System Caches**: User library caches and logs
 - **Storage**: Old downloads (30+ days), trash, Time Machine snapshots
 - **Docker**: Unused containers, images, and volumes
+
+## Android Studio Cleaning Details
+
+The script cleans the following Android-related directories:
+- `~/.android/avd/*/cache` - Individual AVD cache directories
+- `~/.android/cache` - General Android cache
+- `~/.android/build-cache` - Android build cache
+- `~/Library/Caches/AndroidStudio*` - Android Studio cache
+- `~/Library/Application Support/Google/AndroidStudio*/caches` - IDE caches
+- `~/Library/Logs/Google/AndroidStudio*` - Android Studio logs
+
+**Note**: Gradle caches are detected but not automatically cleaned to prevent breaking active projects. The script will notify you if Gradle cache is found and suggest running `./gradlew cleanBuildCache` in your projects.
 
 ## Safety
 
@@ -81,6 +107,7 @@ The script will display an interactive menu with the following options:
 - Each operation shows the amount of space freed
 - You can run individual cleaning operations instead of full maintenance
 - Smart handling of system directories with proper permission checks
+- Gradle cache requires manual cleaning to prevent project issues
 - System restart is recommended after full maintenance
 
 ## Log Files
@@ -93,9 +120,11 @@ Log files are automatically created with timestamp:
 ## Space Savings
 
 Typical space savings after running full maintenance:
+
 - Xcode caches: 5-20 GB
 - iOS Simulator: 1-5 GB
-- iOS Firmwares (IPSW): 3-8 GB per file
+- Android Studio & Emulator: 5-8 GB
+- iOS Firmwares (IPSW): 3-11 GB per file
 - System caches: 500 MB - 5 GB
 - Docker: 1-10 GB
-- Total: **10-50+ GB** depending on usage
+- **Total: 15-60+ GB** depending on usage

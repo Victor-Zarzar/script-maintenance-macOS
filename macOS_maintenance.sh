@@ -237,6 +237,96 @@ clean_ios_ipsw() {
     log_action "iOS IPSW files cleaned"
 }
 
+clean_android_studio() {
+    print_section "Cleaning Android Studio & Emulator"
+    
+    local android_paths=(
+        "$HOME/.android/avd/*.avd/cache"
+        "$HOME/.android/cache"
+        "$HOME/.android/build-cache"
+        "$HOME/Library/Caches/AndroidStudio*"
+        "$HOME/Library/Application Support/Google/AndroidStudio*/caches"
+        "$HOME/Library/Logs/Google/AndroidStudio*"
+    )
+    
+    local total_size=0
+    local items_cleaned=0
+    
+    if [ -d "$HOME/.android/avd" ]; then
+        for avd_dir in "$HOME/.android/avd"/*.avd; do
+            if [ -d "$avd_dir/cache" ]; then
+                local size=$(get_folder_size "$avd_dir/cache")
+                if [ "$size" -gt 0 ]; then
+                    rm -rf "$avd_dir/cache"/* 2>/dev/null && \
+                        print_success "AVD cache ($(basename "$avd_dir")): $(format_bytes $((size * 1024)))"
+                    total_size=$((total_size + size))
+                    items_cleaned=$((items_cleaned + 1))
+                fi
+            fi
+        done
+    fi
+    
+    local cache_dirs=(
+        "$HOME/.android/cache"
+        "$HOME/.android/build-cache"
+    )
+    
+    for path in "${cache_dirs[@]}"; do
+        if [ -d "$path" ]; then
+            local size=$(get_folder_size "$path")
+            if [ "$size" -gt 0 ]; then
+                rm -rf "$path"/* 2>/dev/null && \
+                    print_success "$(basename "$path"): $(format_bytes $((size * 1024)))"
+                total_size=$((total_size + size))
+                items_cleaned=$((items_cleaned + 1))
+            fi
+        fi
+    done
+    
+    for pattern in "$HOME/Library/Caches/AndroidStudio"* "$HOME/Library/Application Support/Google/AndroidStudio"*/caches; do
+        for path in $pattern; do
+            if [ -d "$path" ]; then
+                local size=$(get_folder_size "$path")
+                if [ "$size" -gt 0 ]; then
+                    rm -rf "$path"/* 2>/dev/null && \
+                        print_success "Android Studio cache: $(format_bytes $((size * 1024)))"
+                    total_size=$((total_size + size))
+                    items_cleaned=$((items_cleaned + 1))
+                fi
+            fi
+        done
+    done
+    
+    for log_path in "$HOME/Library/Logs/Google/AndroidStudio"*; do
+        if [ -d "$log_path" ]; then
+            local size=$(get_folder_size "$log_path")
+            if [ "$size" -gt 0 ]; then
+                rm -rf "$log_path"/* 2>/dev/null && \
+                    print_success "Android Studio logs: $(format_bytes $((size * 1024)))"
+                total_size=$((total_size + size))
+                items_cleaned=$((items_cleaned + 1))
+            fi
+        fi
+    done
+    
+    if [ -d "$HOME/.gradle/caches" ]; then
+        local size=$(get_folder_size "$HOME/.gradle/caches")
+        if [ "$size" -gt 0 ]; then
+            print_info "Gradle cache found: $(format_bytes $((size * 1024)))"
+            print_warning "Run './gradlew cleanBuildCache' in your projects to clean safely"
+        fi
+    fi
+    
+    if [ "$items_cleaned" -eq 0 ]; then
+        print_info "No Android Studio/Emulator cache found"
+    else
+        print_success "Total Android cleaned: $(format_bytes $((total_size * 1024)))"
+        TOTAL_CLEANED=$((TOTAL_CLEANED + total_size))
+    fi
+    
+    log_action "Android Studio & Emulator cleaned"
+}
+
 clean_nvm_npm() {
     print_section "Cleaning NPM/NVM Cache"
     
@@ -430,17 +520,18 @@ show_menu() {
     echo "2)  Update system and Homebrew"
     echo "3)  Clean update cache"
     echo "4)  Clean Xcode cache"
-    echo "5)  Clean iOS simulator"
-    echo "6)  clean iOS firmwares (IPSW)"
-    echo "7)  Clean NPM/NVM"
-    echo "8)  Clean PNPM"
-    echo "9)  Clean Flutter/Dart/FVM"
-    echo "10)  Clean system caches"
-    echo "11) Clean downloads and trash"
-    echo "12) Clean old logs"
-    echo "13) Optimize storage"
-    echo "14) Clean Docker"
-    echo "15) View action log"
+    echo "5)  Clean iOS simulator" 
+    echo "6)  Clean iOS firmwares (IPSW)"
+    echo "7)  Clean Android Studio & Emulator"
+    echo "8)  Clean NPM/NVM"
+    echo "9)  Clean PNPM"
+    echo "10) Clean Flutter/Dart/FVM"
+    echo "11) Clean system caches"
+    echo "12) Clean downloads and trash"
+    echo "13) Clean old logs"
+    echo "14) Optimize storage"
+    echo "15) Clean Docker"
+    echo "16) View action log"
     echo "0)  Exit"
     echo ""
     echo -n "Choose an option: "
@@ -457,6 +548,7 @@ run_full_maintenance() {
     clean_xcode_cache
     clean_ios_simulator
     clean_ios_ipsw
+    clean_android_studio
     clean_nvm_npm
     clean_pnpm
     clean_flutter_dart
@@ -505,15 +597,16 @@ main() {
             4) clean_xcode_cache ;;
             5) clean_ios_simulator ;;
             6) clean_ios_ipsw ;;
-            7) clean_nvm_npm ;;
-            8) clean_pnpm ;;
-            9) clean_flutter_dart ;;
-            10) clean_system_caches ;;
-            11) clean_downloads_trash ;;
-            12) clean_logs ;;
-            13) optimize_storage ;;
-            14) clean_docker ;;
-            15) cat "$LOG_FILE" | less ;;
+            7) clean_android_studio ;;
+            8) clean_nvm_npm ;;
+            9) clean_pnpm ;;
+            10) clean_flutter_dart ;;
+            11) clean_system_caches ;;
+            12) clean_downloads_trash ;;
+            13) clean_logs ;;
+            14) optimize_storage ;;
+            15) clean_docker ;;
+            16) cat "$LOG_FILE" | less ;;
             0) 
                 print_success "Goodbye!"
                 log_action "Script finished"
