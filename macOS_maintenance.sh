@@ -401,29 +401,54 @@ clean_nvm_npm() {
     log_action "NPM/NVM cleaned"
 }
 
-clean_pnpm() {
-    print_section "Cleaning PNPM Cache"
+clean_bun() {
+    print_section "Cleaning Bun Cache"
     
-    if command -v pnpm &> /dev/null; then
-        local paths=(
-            "$HOME/.pnpm-store"
-            "$HOME/Library/pnpm/store"
-            "$HOME/.local/share/pnpm/store"
-        )
+    if command -v bun &> /dev/null; then
+        local bun_version=$(bun --version 2>/dev/null)
+        print_info "Bun version: $bun_version"
         
-        for path in "${paths[@]}"; do
-            if [ -d "$path" ]; then
-                local size=$(get_folder_size "$path")
-                TOTAL_CLEANED=$((TOTAL_CLEANED + size))
+        local bun_cache_dir="$HOME/.bun/install/cache"
+        local bun_global_dir="$HOME/.bun/install/global"
+        
+        local total_size=0
+        
+        if [ -d "$bun_cache_dir" ]; then
+            local cache_size=$(get_folder_size "$bun_cache_dir")
+            if [ "$cache_size" -gt 0 ]; then
+                print_info "Bun cache found: $(format_bytes $((cache_size * 1024)))"
+                rm -rf "$bun_cache_dir"/* 2>/dev/null && \
+                    print_success "Bun cache cleared: $(format_bytes $((cache_size * 1024)))"
+                total_size=$((total_size + cache_size))
             fi
-        done
+        fi
         
-        pnpm store prune &>/dev/null && print_success "pnpm store cleaned"
+        if [ -d "$HOME/.bun/install" ]; then
+            find "$HOME/.bun/install" -name ".tmp-*" -type d -exec rm -rf {} + 2>/dev/null && \
+                print_success "Bun temporary files removed"
+        fi
+        
+        local bun_logs="$HOME/.bun/logs"
+        if [ -d "$bun_logs" ]; then
+            local logs_size=$(get_folder_size "$bun_logs")
+            if [ "$logs_size" -gt 0 ]; then
+                rm -rf "$bun_logs"/* 2>/dev/null && \
+                    print_success "Bun logs cleared: $(format_bytes $((logs_size * 1024)))"
+                total_size=$((total_size + logs_size))
+            fi
+        fi
+        
+        if [ "$total_size" -eq 0 ]; then
+            print_info "Bun cache is already clean"
+        else
+            print_success "Total Bun cleaned: $(format_bytes $((total_size * 1024)))"
+            TOTAL_CLEANED=$((TOTAL_CLEANED + total_size))
+        fi
     else
-        print_info "PNPM not found"
+        print_info "Bun not found"
     fi
     
-    log_action "PNPM cleaned"
+    log_action "Bun cache cleaned"
 }
 
 clean_flutter_dart() {
@@ -575,7 +600,7 @@ show_menu() {
     echo "6)  Clean iOS firmwares (IPSW)"
     echo "7)  Clean Android Studio & Emulator"
     echo "8)  Clean NPM/NVM"
-    echo "9)  Clean PNPM"
+    echo "9)  Clean Bun"
     echo "10) Clean Flutter/Dart/FVM"
     echo "11) Clean system caches"
     echo "12) Clean downloads and trash"
@@ -601,7 +626,7 @@ run_full_maintenance() {
     clean_ios_ipsw
     clean_android_studio
     clean_nvm_npm
-    clean_pnpm
+    clean_bun
     clean_flutter_dart
     clean_system_caches
     clean_downloads_trash
@@ -650,7 +675,7 @@ main() {
             6) clean_ios_ipsw ;;
             7) clean_android_studio ;;
             8) clean_nvm_npm ;;
-            9) clean_pnpm ;;
+            9) clean_bun ;;
             10) clean_flutter_dart ;;
             11) clean_system_caches ;;
             12) clean_downloads_trash ;;
