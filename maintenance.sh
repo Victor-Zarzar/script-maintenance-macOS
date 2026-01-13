@@ -19,6 +19,7 @@ source "$LIB_DIR/flutter-clean.sh"
 source "$LIB_DIR/system-clean.sh"
 source "$LIB_DIR/docker-clean.sh"
 source "$LIB_DIR/storage-optimize.sh"
+source "$LIB_DIR/restart-macos.sh"
 
 LOG_FILE="$HOME/macos_maintenance_$(date +%Y%m%d_%H%M%S).log"
 TOTAL_CLEANED=0
@@ -49,6 +50,7 @@ show_menu() {
     echo "15) Optimize storage"
     echo "16) Clean Docker"
     echo "17) View action log"
+    echo "18) Restart macOS"
     echo "0)  Exit"
     echo ""
     echo -n "Choose an option: "
@@ -75,6 +77,7 @@ run_full_maintenance() {
     clean_logs
     optimize_storage
     clean_docker
+    restart_macos
 
     local final_space=$(get_disk_usage)
 
@@ -125,7 +128,8 @@ main() {
             14) clean_logs ;;
             15) optimize_storage ;;
             16) clean_docker ;;
-            17) cat "$LOG_FILE" | less ;;
+            17) restart_macos ;;
+            18) cat "$LOG_FILE" | less ;;
             0)
                 print_success "Goodbye!"
                 log_action "Script finished"

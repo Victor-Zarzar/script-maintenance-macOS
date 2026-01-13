@@ -17,6 +17,7 @@ A comprehensive, modular automated maintenance script for macOS that helps clean
 - **System Cache Removal**: Clean user library caches and logs
 - **Docker Cleanup**: Remove unused containers, images, and volumes
 - **Time Machine Snapshot Management**: Remove local snapshots
+- **System Restart**: Safe restart option with countdown timer
 - **Automatic Log Generation**: Detailed maintenance logs with timestamps
 
 ## Requirements
@@ -41,7 +42,8 @@ maintenance-macos/
 │   ├── flutter-clean.sh  # Flutter/Dart/FVM cleaning
 │   ├── system-clean.sh   # System caches, downloads, logs
 │   ├── docker-clean.sh   # Docker cleanup
-│   └── storage-optimize.sh # Storage optimization
+│   ├── storage-optimize.sh # Storage optimization
+│   └── restart-macos.sh  # System restart function
 └── README.md             # This file
 ```
 
@@ -92,7 +94,8 @@ The script will display an interactive menu with the following options:
 15. Optimize storage
 16. Clean Docker
 17. View action log
-18. Exit
+18. Restart macOS
+19. Exit
 
 ## What Gets Cleaned
 
@@ -122,6 +125,23 @@ The script will display an interactive menu with the following options:
 - **System Caches**: User library caches and logs (500 MB - 5 GB)
 - **Storage**: Old downloads (30+ days), trash, Time Machine snapshots
 - **Docker**: Unused containers, images, volumes (1-10 GB)
+- **System Restart**: Safe restart with confirmation and countdown
+
+## System Restart Feature
+
+The script includes a safe system restart option:
+
+- **Confirmation required**: Prevents accidental restarts
+- **5-second countdown**: Time to cancel with Ctrl+C
+- **Logged action**: Restart is recorded in maintenance log
+- **Works independently**: Can be used after any maintenance operation
+
+Example usage:
+
+```bash
+./maintenance.sh
+# Choose option 18 to restart your Mac
+```
 
 ## Android Studio & Gradle Cleaning Details
 
@@ -186,6 +206,7 @@ clean_your_tool() {
 - You can run individual cleaning operations instead of full maintenance
 - Smart handling of system directories with proper permission checks
 - Gradle cache is completely removed (safe, will rebuild automatically)
+- System restart requires confirmation and provides countdown timer
 - System restart is recommended after full maintenance
 
 ## Log Files
@@ -224,6 +245,7 @@ Typical space savings after running full maintenance:
 - Check the log file if any cleaning fails
 - Some operations may require administrator password
 - Gradle cache will be automatically rebuilt on next build
+- Use option **18** to safely restart your Mac after maintenance
 - System restart recommended after full maintenance
 
 ## Troubleshooting
@@ -244,6 +266,9 @@ Some operations may request administrator password.
 **Gradle rebuilding:**
 After cleaning Gradle cache, first build will take longer as cache rebuilds.
 
+**Restart requires sudo:**
+System restart operation requires administrator privileges.
+
 **View detailed errors:**
 
 ```bash
@@ -257,6 +282,7 @@ cat ~/macos_maintenance_*.log
 - **Reusability**: Modules can be used independently
 - **Scalability**: Easy to add new cleaning functions
 - **Debugging**: Easier to find and fix issues
+- **Safety**: Isolated functions reduce risk of errors
 
 ## License
 
