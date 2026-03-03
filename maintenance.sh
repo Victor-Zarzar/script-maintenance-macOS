@@ -20,6 +20,8 @@ source "$LIB_DIR/system-clean.sh"
 source "$LIB_DIR/docker-clean.sh"
 source "$LIB_DIR/storage-optimize.sh"
 source "$LIB_DIR/restart-macos.sh"
+source "$LIB_DIR/crossover-clean.sh"
+source "$LIB_DIR/expo-clean.sh"
 
 LOG_FILE="$HOME/macos_maintenance_$(date +%Y%m%d_%H%M%S).log"
 TOTAL_CLEANED=0
@@ -51,6 +53,8 @@ show_menu() {
     echo "16) Clean Docker"
     echo "17) View action log"
     echo "18) Restart macOS"
+    echo "19) Clean CrossOver cache"
+    echo "20) Clean Expo & React Native cache"
     echo "0)  Exit"
     echo ""
     echo -n "Choose an option: "
@@ -77,6 +81,8 @@ run_full_maintenance() {
     clean_logs
     optimize_storage
     clean_docker
+    clean_crossover
+    clean_expo_react_native
     restart_macos
 
     local final_space=$(get_disk_usage)
@@ -110,17 +116,16 @@ main() {
     while true; do
         show_menu
         read -r option
-
         case $option in
-            1) run_full_maintenance ;;
-            2) update_system ;;
-            3) clean_software_update_cache ;;
-            4) clean_xcode_cache ;;
-            5) clean_ios_simulator ;;
-            6) clean_ios_ipsw ;;
-            7) clean_android_studio ;;
-            8) clean_nvm_npm ;;
-            9) clean_bun ;;
+            1)  run_full_maintenance ;;
+            2)  update_system ;;
+            3)  clean_software_update_cache ;;
+            4)  clean_xcode_cache ;;
+            5)  clean_ios_simulator ;;
+            6)  clean_ios_ipsw ;;
+            7)  clean_android_studio ;;
+            8)  clean_nvm_npm ;;
+            9)  clean_bun ;;
             10) clean_pnpm ;;
             11) clean_flutter_dart ;;
             12) clean_system_caches ;;
@@ -128,8 +133,10 @@ main() {
             14) clean_logs ;;
             15) optimize_storage ;;
             16) clean_docker ;;
-            17) restart_macos ;;
-            18) cat "$LOG_FILE" | less ;;
+            17) cat "$LOG_FILE" | less ;;
+            18) restart_macos ;;
+            19) clean_crossover ;;           # ← novo
+            20) clean_expo_react_native ;;   # ← novo
             0)
                 print_success "Goodbye!"
                 log_action "Script finished"

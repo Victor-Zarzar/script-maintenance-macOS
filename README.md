@@ -17,6 +17,8 @@ A comprehensive, modular automated maintenance script for macOS that helps clean
 - **System Cache Removal**: Clean user library caches and logs
 - **Docker Cleanup**: Remove unused containers, images, and volumes
 - **Time Machine Snapshot Management**: Remove local snapshots
+- **Expo Clean and React Native**: Clean Expo and React Native caches
+- **Crossover Clean**: Clean Crossover cache
 - **System Restart**: Safe restart option with countdown timer
 - **Automatic Log Generation**: Detailed maintenance logs with timestamps
 
@@ -42,6 +44,8 @@ maintenance-macos/
 │   ├── flutter-clean.sh  # Flutter/Dart/FVM cleaning
 │   ├── system-clean.sh   # System caches, downloads, logs
 │   ├── docker-clean.sh   # Docker cleanup
+│   ├── crossover-clean.sh  # CrossOver Wine bottles & caches
+│   ├── expo-clean.sh       # Expo & React Native caches
 │   ├── storage-optimize.sh # Storage optimization
 │   └── restart-macos.sh  # System restart function
 └── README.md             # This file
@@ -111,6 +115,7 @@ The script will display an interactive menu with the following options:
 - **iOS Firmwares**: IPSW files downloaded by Finder/iTunes (3-11 GB each)
 - **Flutter/Dart/FVM**: Development tool caches and pub cache
 - **Android**: Emulator caches, build caches, Android Studio logs
+- **Expo/React Native**: Cache and temporary files
 
 ### Package Managers
 
@@ -136,11 +141,14 @@ The script includes a safe system restart option:
 - **Logged action**: Restart is recorded in maintenance log
 - **Works independently**: Can be used after any maintenance operation
 
+## CrossOver Wine Cleaning
+
+- **CrossOver**: Wine bottles and caches
+
 Example usage:
 
 ```bash
 ./maintenance.sh
-# Choose option 18 to restart your Mac
 ```
 
 ## Android Studio & Gradle Cleaning Details
