@@ -99,7 +99,9 @@ The script will display an interactive menu with the following options:
 16. Clean Docker
 17. View action log
 18. Restart macOS
-19. Exit
+19. Clean CrossOver cache
+20. Clean Expo & React Native cache
+21. Exit
 
 ## What Gets Cleaned
 
