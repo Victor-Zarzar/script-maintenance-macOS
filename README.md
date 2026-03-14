@@ -5,20 +5,21 @@ A comprehensive, modular automated maintenance script for macOS that helps clean
 ## Features
 
 - **Modular Architecture**: Clean, organized code split into focused modules
-- **System and Homebrew Updates**: Keep your system up to date
-- **Xcode Cache Cleaning**: Remove DerivedData, archives, and simulator files
+- **System and Homebrew Updates**: Keep your system up to date with full `brew cleanup --prune=all` and `brew autoremove`
+- **Xcode Cache Cleaning**: Remove DerivedData, Archives, DeviceSupport symbols, and simulator files
 - **iOS Simulator Cleanup**: Clean simulator data and caches
 - **iOS Firmware Files (IPSW) Removal**: Delete old iOS update files
 - **Android Studio & Emulator**: Complete cache cleaning including Gradle
-- **NPM/NVM Cache Management**: Clean Node.js package manager caches
-- **Bun Store Optimization**: Clean Bun cache and logs
-- **PNPM Cache Management**: Prune unused packages
+- **Node.js Ecosystem**: NPM/NVM, PNPM, Bun, Yarn (Classic & Berry), Volta, Turbo, and orphan node_modules
 - **Flutter/Dart/FVM Cache**: Clean Flutter development caches
-- **System Cache Removal**: Clean user library caches and logs
+- **Expo & React Native**: Metro, Watchman, EAS CLI, and Android build artifacts
+- **Dev Tools**: CocoaPods, Ruby (rbenv/RVM/gems), Python (pyenv/pip/\_\_pycache\_\_)
+- **System Cache Removal**: User caches, app sandbox containers, diagnostic reports, logs
+- **System Assets**: AssetsV2 / iWork Templates, iCloud CloudKit cache, Spotlight index rebuild
 - **Docker Cleanup**: Remove unused containers, images, and volumes
 - **Time Machine Snapshot Management**: Remove local snapshots
-- **Expo Clean and React Native**: Clean Expo and React Native caches
-- **Crossover Clean**: Clean Crossover cache
+- **CrossOver Cleaning**: Clean CrossOver Wine bottles & caches
+- **DNS Cache Flush**: Reset DNS with `dscacheutil` + `mDNSResponder`
 - **System Restart**: Safe restart option with countdown timer
 - **Automatic Log Generation**: Detailed maintenance logs with timestamps
 
@@ -32,107 +33,108 @@ A comprehensive, modular automated maintenance script for macOS that helps clean
 
 ```
 maintenance-macos/
-├── maintenance.sh        # Main script with interactive menu
-├── lib/                  # Modular components
-│   ├── colors.sh         # Color definitions for output
-│   ├── helpers.sh        # Helper functions (size calc, formatting, progress)
-│   ├── system-update.sh  # System and Homebrew updates
-│   ├── xcode-clean.sh    # Xcode cache cleaning
-│   ├── ios-clean.sh      # iOS Simulator and IPSW cleaning
-│   ├── android-clean.sh  # Android Studio, Emulator & Gradle
-│   ├── node-clean.sh     # NPM, Bun, PNPM cleaning
-│   ├── flutter-clean.sh  # Flutter/Dart/FVM cleaning
-│   ├── system-clean.sh   # System caches, downloads, logs
-│   ├── docker-clean.sh   # Docker cleanup
+├── maintenance.sh          # Main script with interactive menu
+├── lib/                    # Modular components
+│   ├── colors.sh           # Color definitions for output
+│   ├── helpers.sh          # Helper functions (size calc, formatting, progress)
+│   ├── system-update.sh    # System and Homebrew updates
+│   ├── ios-clean.sh        # iOS Simulator and IPSW cleaning
+│   ├── android-clean.sh    # Android Studio, Emulator & Gradle
+│   ├── node-clean.sh       # NPM, Bun, PNPM, Yarn, Volta, Turbo, node_modules
+│   ├── flutter-clean.sh    # Flutter/Dart/FVM cleaning
+│   ├── system-clean.sh     # System caches, Xcode DerivedData, containers, DNS
+│   ├── docker-clean.sh     # Docker cleanup
 │   ├── crossover-clean.sh  # CrossOver Wine bottles & caches
 │   ├── expo-clean.sh       # Expo & React Native caches
+│   ├── devtools-clean.sh   # Homebrew, CocoaPods, Ruby, Python
+│   ├── assets-clean.sh     # AssetsV2, iWork templates, iCloud, Spotlight
 │   ├── storage-optimize.sh # Storage optimization
-│   └── restart-macos.sh  # System restart function
-└── README.md             # This file
+│   └── restart-macos.sh    # System restart function
+└── README.md               # This file
 ```
 
 ## Installation
 
-Clone the repository:
-
 ```bash
 git clone https://github.com/Victor-Zarzar/script-maintenance-macOS
-```
-
-Navigate to the directory:
-
-```bash
 cd script-maintenance-macOS
-```
-
-Make the script executable:
-
-```bash
 chmod +x maintenance.sh
-```
-
-## Usage
-
-Run the script:
-
-```bash
 ./maintenance.sh
 ```
 
 The script will display an interactive menu with the following options:
 
-1. Run complete maintenance
-2. Update system and Homebrew
-3. Clean update cache
-4. Clean Xcode cache
-5. Clean iOS simulator
-6. Clean iOS firmwares (IPSW)
-7. Clean Android Studio & Emulator
-8. Clean NPM/NVM
-9. Clean Bun
-10. Clean PNPM
-11. Clean Flutter/Dart/FVM
-12. Clean system caches
-13. Clean downloads and trash
-14. Clean old logs
-15. Optimize storage
-16. Clean Docker
-17. View action log
-18. Restart macOS
-19. Clean CrossOver cache
-20. Clean Expo & React Native cache
-21. Exit
+```
+1)  Run complete maintenance
+2)  Update system and Homebrew
+3)  Clean update cache
+4)  Clean system (caches, logs, Xcode, DNS)
+5)  Clean system assets (AssetsV2, iCloud, Spotlight)
+6)  Optimize storage
+7)  Clean iOS simulator
+8)  Clean iOS firmwares (IPSW)
+9)  Clean Android Studio & Emulator
+10) Clean Node.js (NPM, PNPM, Bun, Yarn, Volta, Turbo)
+11) Clean Flutter / Dart / FVM
+12) Clean Expo & React Native
+13) Clean dev tools (Homebrew, CocoaPods, Ruby, Python)
+14) Clean Docker
+15) Clean CrossOver cache
+16) View action log
+17) Restart macOS
+0)  Exit
+```
 
 ## What Gets Cleaned
 
+### System
+
+- **System Caches**: User library caches, app sandbox containers (Caches/Logs only)
+- **Diagnostic Reports**: `~/Library/Logs`, `/Library/Logs/DiagnosticReports`
+- **Xcode DerivedData**: Build artifacts (5–20 GB), old DeviceSupport symbols
+- **Xcode Archives**: Optional removal with confirmation
+- **DNS Cache**: `dscacheutil` flush + `mDNSResponder` restart
+- **AssetsV2 / iWork Templates**: Pages, Numbers, Keynote templates (~800 MB, re-downloaded on demand)
+- **iCloud CloudKit Cache**: Local CloudKit cache rebuild automatically
+- **Spotlight Index**: Optional full rebuild
+
 ### Development Tools
 
-- **Xcode**: DerivedData (5-20 GB), Archives, Simulator caches
-- **Android Studio & Emulator**: AVD caches, build caches, IDE caches, logs (5-8 GB)
+- **Xcode**: DerivedData, Archives, Simulator caches, template cache
+- **Android Studio & Emulator**: AVD caches, build caches, IDE caches, logs
 - **Gradle**: Complete cache removal, old wrappers, daemon logs
-- **iOS Simulator**: Simulator data and caches (1-5 GB)
+- **iOS Simulator**: Simulator data and caches (1–5 GB)
+- **Homebrew**: `brew upgrade`, `cleanup --prune=all`, `autoremove`, download cache
+- **CocoaPods**: Download cache + spec repos (with confirmation)
+- **Ruby**: rbenv/RVM old versions, gem download cache
+- **Python**: pyenv old versions, pip cache, `__pycache__` in projects
 
 ### Mobile Development
 
-- **iOS Firmwares**: IPSW files downloaded by Finder/iTunes (3-11 GB each)
+- **iOS Firmwares**: IPSW files downloaded by Finder/iTunes (3–11 GB each)
 - **Flutter/Dart/FVM**: Development tool caches and pub cache
-- **Android**: Emulator caches, build caches, Android Studio logs
-- **Expo/React Native**: Cache and temporary files
+- **Expo/React Native**: Metro cache, Watchman, EAS CLI, Android build artifacts
+
+### Node.js Ecosystem
+
+- **NPM/NVM**: npm cache clean
+- **Bun**: Install cache, logs, temporary files
+- **PNPM**: Store prune
+- **Yarn Classic**: `yarn cache clean`
+- **Yarn Berry**: Global Berry cache
+- **Volta**: Temporary download files
+- **Turbo**: Global `~/.turbo` cache + project caches (with confirmation)
+- **Orphan node_modules**: Scans `~/Projects` for `node_modules` older than 30 days (with confirmation)
 
 ### Package Managers
 
-- **NPM/NVM**: Node package manager caches
-- **Bun**: Cache, logs, and temporary files
-- **PNPM**: Store pruning
 - **Gradle**: Full cache removal with wrapper optimization
 
-### System Maintenance
+### Other
 
-- **System Updates**: Software update caches
-- **System Caches**: User library caches and logs (500 MB - 5 GB)
-- **Storage**: Old downloads (30+ days), trash, Time Machine snapshots
-- **Docker**: Unused containers, images, volumes (1-10 GB)
-- **System Restart**: Safe restart with confirmation and countdown
+- **Storage**: Old downloads (30+ days), trash, Time Machine snapshots, Photos cache
+- **Docker**: Unused containers, images, volumes, build cache
+- **CrossOver**: Wine bottles and caches
 
 ## System Restart Feature
 
@@ -143,37 +145,16 @@ The script includes a safe system restart option:
 - **Logged action**: Restart is recorded in maintenance log
 - **Works independently**: Can be used after any maintenance operation
 
-## CrossOver Wine Cleaning
+## Entrypoints
 
-- **CrossOver**: Wine bottles and caches
+Functions are grouped into entrypoints for convenience in `run_full_maintenance()` and the menu:
 
-Example usage:
-
-```bash
-./maintenance.sh
-```
-
-## Android Studio & Gradle Cleaning Details
-
-The script performs comprehensive Android cleaning:
-
-### Android Studio & Emulator
-
-- `~/.android/avd/*/cache` - Individual AVD cache directories
-- `~/.android/cache` - General Android cache
-- `~/.android/build-cache` - Android build cache
-- `~/Library/Caches/AndroidStudio*` - Android Studio cache
-- `~/Library/Application Support/Google/AndroidStudio*/caches` - IDE caches
-- `~/Library/Logs/Google/AndroidStudio*` - Android Studio logs
-
-### Gradle (Complete Removal)
-
-- `~/.gradle/caches/*` - Entire Gradle cache (will be rebuilt on next build)
-- `~/.gradle/wrapper/dists/*` - Keeps only latest wrapper version
-- `~/.gradle/daemon/*.log` - Old daemon logs (7+ days)
-- `~/Projects/**/.gradle` - Project-level build caches (with confirmation)
-
-**Note**: Gradle cache is completely removed, which is safe as it will be automatically rebuilt on your next build. This can free up several GB of space.
+| Entrypoint              | Includes                                                               |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `clean_system_clean`    | system caches, downloads, logs, Xcode DerivedData, app containers, DNS |
+| `clean_system_assets`   | AssetsV2, Xcode templates, iCloud cache, Spotlight                     |
+| `clean_system_nodejs`   | NPM, PNPM, Bun, Yarn, Volta, Turbo, node_modules                       |
+| `clean_system_devtools` | Homebrew, CocoaPods, Ruby, Python                                      |
 
 ## Customization
 
@@ -191,7 +172,6 @@ clean_your_tool() {
     print_section "Cleaning Your Tool"
 
     if command -v yourtool &> /dev/null; then
-
         print_success "Tool cleaned"
     else
         print_info "Tool not found"
@@ -206,8 +186,8 @@ clean_your_tool() {
 1. Create file in `lib/module-name.sh`
 2. Add shebang and section comment
 3. Create cleaning functions
-4. Add source in `maintenance.sh`
-5. Call functions in `run_full_maintenance()`
+4. Add `source "$LIB_DIR/module-name.sh"` in `maintenance.sh`
+5. Call functions in `run_full_maintenance()` or add to an entrypoint
 
 ## Safety
 
@@ -215,9 +195,9 @@ clean_your_tool() {
 - Each operation shows the amount of space freed
 - You can run individual cleaning operations instead of full maintenance
 - Smart handling of system directories with proper permission checks
-- Gradle cache is completely removed (safe, will rebuild automatically)
+- All `get_folder_size` calls use `${size:-0}` to prevent integer expression errors
+- Destructive operations (archives, spec repos, node_modules, old language versions) always ask for confirmation
 - System restart requires confirmation and provides countdown timer
-- System restart is recommended after full maintenance
 
 ## Log Files
 
@@ -227,7 +207,7 @@ Log files are automatically created with timestamp:
 ~/macos_maintenance_YYYYMMDD_HHMMSS.log
 ```
 
-View the log from the menu (option 17) or manually:
+View the log from the menu (option 16) or manually:
 
 ```bash
 cat ~/macos_maintenance_*.log
@@ -237,16 +217,18 @@ cat ~/macos_maintenance_*.log
 
 Typical space savings after running full maintenance:
 
-- **Xcode caches**: 5-20 GB
-- **iOS Simulator**: 1-5 GB
-- **Android Studio & Emulator**: 5-8 GB
-- **Gradle cache**: 2-5 GB
-- **iOS Firmwares (IPSW)**: 3-11 GB per file
-- **System caches**: 500 MB - 5 GB
-- **Docker**: 1-10 GB
-- **Bun/NPM/PNPM**: 500 MB - 2 GB
-
-**Total**: 15-60+ GB depending on usage
+| Area                                | Savings          |
+| ----------------------------------- | ---------------- |
+| Xcode DerivedData & caches          | 5–20 GB          |
+| iOS Simulator                       | 1–5 GB           |
+| Android Studio & Gradle             | 5–8 GB           |
+| iOS Firmwares (IPSW)                | 3–11 GB per file |
+| System caches & logs                | 500 MB – 5 GB    |
+| Docker                              | 1–10 GB          |
+| Node.js ecosystem                   | 500 MB – 3 GB    |
+| AssetsV2 / iWork templates          | ~800 MB          |
+| Dev tools (Ruby, Python, CocoaPods) | 500 MB – 2 GB    |
+| **Total**                           | **15–65+ GB**    |
 
 ## Tips
 
@@ -255,7 +237,7 @@ Typical space savings after running full maintenance:
 - Check the log file if any cleaning fails
 - Some operations may require administrator password
 - Gradle cache will be automatically rebuilt on next build
-- Use option **18** to safely restart your Mac after maintenance
+- Use option **17** to safely restart your Mac after maintenance
 - System restart recommended after full maintenance
 
 ## Troubleshooting
@@ -270,14 +252,11 @@ If you encounter issues:
 
 ### Common Issues
 
-**Permission errors:**
-Some operations may request administrator password.
+**Permission errors:** Some operations may request administrator password.
 
-**Gradle rebuilding:**
-After cleaning Gradle cache, first build will take longer as cache rebuilds.
+**Gradle rebuilding:** After cleaning Gradle cache, first build will take longer as cache rebuilds.
 
-**Restart requires sudo:**
-System restart operation requires administrator privileges.
+**Restart requires sudo:** System restart operation requires administrator privileges.
 
 **View detailed errors:**
 

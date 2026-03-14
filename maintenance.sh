@@ -11,7 +11,6 @@ LIB_DIR="$SCRIPT_DIR/lib"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/helpers.sh"
 source "$LIB_DIR/system-update.sh"
-source "$LIB_DIR/xcode-clean.sh"
 source "$LIB_DIR/ios-clean.sh"
 source "$LIB_DIR/android-clean.sh"
 source "$LIB_DIR/node-clean.sh"
@@ -22,6 +21,8 @@ source "$LIB_DIR/storage-optimize.sh"
 source "$LIB_DIR/restart-macos.sh"
 source "$LIB_DIR/crossover-clean.sh"
 source "$LIB_DIR/expo-clean.sh"
+source "$LIB_DIR/devtools-clean.sh"
+source "$LIB_DIR/assets-clean.sh"
 
 LOG_FILE="$HOME/macos_maintenance_$(date +%Y%m%d_%H%M%S).log"
 TOTAL_CLEANED=0
@@ -38,23 +39,20 @@ show_menu() {
     echo "1)  Run complete maintenance"
     echo "2)  Update system and Homebrew"
     echo "3)  Clean update cache"
-    echo "4)  Clean Xcode cache"
-    echo "5)  Clean iOS simulator"
-    echo "6)  Clean iOS firmwares (IPSW)"
-    echo "7)  Clean Android Studio & Emulator"
-    echo "8)  Clean NPM/NVM"
-    echo "9)  Clean Bun"
-    echo "10) Clean PNPM"
-    echo "11) Clean Flutter/Dart/FVM"
-    echo "12) Clean system caches"
-    echo "13) Clean downloads and trash"
-    echo "14) Clean old logs"
-    echo "15) Optimize storage"
-    echo "16) Clean Docker"
-    echo "17) View action log"
-    echo "18) Restart macOS"
-    echo "19) Clean CrossOver cache"
-    echo "20) Clean Expo & React Native cache"
+    echo "4)  Clean system (caches, logs, Xcode, DNS)"
+    echo "5)  Clean system assets (AssetsV2, iCloud, Spotlight)"
+    echo "6)  Optimize storage"
+    echo "7)  Clean iOS simulator"
+    echo "8)  Clean iOS firmwares (IPSW)"
+    echo "9)  Clean Android Studio & Emulator"
+    echo "10) Clean Node.js (NPM, PNPM, Bun, Yarn, Volta, Turbo)"
+    echo "11) Clean Flutter / Dart / FVM"
+    echo "12) Clean Expo & React Native"
+    echo "13) Clean dev tools (Homebrew, CocoaPods, Ruby, Python)"
+    echo "14) Clean Docker"
+    echo "15) Clean CrossOver cache"
+    echo "16) View action log"
+    echo "17) Restart macOS"
     echo "0)  Exit"
     echo ""
     echo -n "Choose an option: "
@@ -68,21 +66,18 @@ run_full_maintenance() {
 
     update_system
     clean_software_update_cache
-    clean_xcode_cache
+    clean_system_clean
+    clean_system_assets
     clean_ios_simulator
     clean_ios_ipsw
     clean_android_studio
-    clean_nvm_npm
-    clean_bun
-    clean_pnpm
+    clean_system_nodejs
     clean_flutter_dart
-    clean_system_caches
-    clean_downloads_trash
-    clean_logs
+    clean_expo_react_native
+    clean_system_devtools
     optimize_storage
     clean_docker
     clean_crossover
-    clean_expo_react_native
     restart_macos
 
     local final_space=$(get_disk_usage)
@@ -120,23 +115,20 @@ main() {
             1)  run_full_maintenance ;;
             2)  update_system ;;
             3)  clean_software_update_cache ;;
-            4)  clean_xcode_cache ;;
-            5)  clean_ios_simulator ;;
-            6)  clean_ios_ipsw ;;
-            7)  clean_android_studio ;;
-            8)  clean_nvm_npm ;;
-            9)  clean_bun ;;
-            10) clean_pnpm ;;
+            4)  clean_system_clean ;;
+            5)  clean_system_assets ;;
+            6)  optimize_storage ;;
+            7)  clean_ios_simulator ;;
+            8)  clean_ios_ipsw ;;
+            9)  clean_android_studio ;;
+            10) clean_system_nodejs ;;
             11) clean_flutter_dart ;;
-            12) clean_system_caches ;;
-            13) clean_downloads_trash ;;
-            14) clean_logs ;;
-            15) optimize_storage ;;
-            16) clean_docker ;;
-            17) cat "$LOG_FILE" | less ;;
-            18) restart_macos ;;
-            19) clean_crossover ;;           # ← novo
-            20) clean_expo_react_native ;;   # ← novo
+            12) clean_expo_react_native ;;
+            13) clean_system_devtools ;;
+            14) clean_docker ;;
+            15) clean_crossover ;;
+            16) cat "$LOG_FILE" | less ;;
+            17) restart_macos ;;
             0)
                 print_success "Goodbye!"
                 log_action "Script finished"
