@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/Victor-Zarzar/dev-cleaner-macOS/compare/v1.0.0...v1.1.0) (2026-03-30)
+
+
+### Features
+
+* add CONTRIBUTING.md template. ([aa3382b](https://github.com/Victor-Zarzar/dev-cleaner-macOS/commit/aa3382bde3732ca525454add666a01e87428946d))
+* add CONTRIBUTING.md template. ([5faa4cd](https://github.com/Victor-Zarzar/dev-cleaner-macOS/commit/5faa4cdfebb09d9f27480b97c736b0f722332ffb))
+
 ## 1.0.0 (2026-03-30)
 
 
