@@ -1,4 +1,10 @@
-# macOS Maintenance Script
+<h1 id="screenshot">Screenshots</h1>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/437654fa-398f-4185-b485-624a7a12cdfa" width="1000" height="600" alt="Architecture">
+</p>
+
+# dev cleaner macOS Script
 
 A comprehensive, modular automated maintenance script for macOS that helps clean cache files, optimize storage, and keep your system running smoothly.
 

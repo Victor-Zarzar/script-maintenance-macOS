@@ -11,6 +11,8 @@ print_header() {
     current_date=$(date '+%Y-%m-%d %H:%M:%S')
     local username
     username=$(whoami)
+    local macos_version
+    macos_version=$(sw_vers -productVersion)
 
     echo -e "${GREEN}"
     echo '   ██████╗██╗     ███████╗ █████╗ ███╗   ██╗███████╗██████╗ '
@@ -29,6 +31,7 @@ print_header() {
     echo -e "${NC}"
     echo -e "  ${GREEN}──────────────────────────────────────────────────────────${NC}"
     echo -e "  ${GREEN}✦ User:${NC}        $username"
+    echo -e "  ${GREEN}✦ macOS:${NC}       $macos_version"
     echo -e "  ${GREEN}✦ Free Space:${NC}  $free_space"
     echo -e "  ${GREEN}✦ Date:${NC}        $current_date"
     echo -e "  ${GREEN}──────────────────────────────────────────────────────────${NC}"
