@@ -32,7 +32,7 @@ A comprehensive, modular automated maintenance script for macOS that helps clean
 ## Project Structure
 
 ```
-maintenance-macos/
+dev-cleaner-macos/
 ├── maintenance.sh          # Main script with interactive menu
 ├── lib/                    # Modular components
 │   ├── colors.sh           # Color definitions for output
@@ -56,8 +56,8 @@ maintenance-macos/
 ## Installation
 
 ```bash
-git clone https://github.com/Victor-Zarzar/script-maintenance-macOS
-cd script-maintenance-macOS
+git clone https://github.com/Victor-Zarzar/dev-cleaner-macOS
+cd dev-cleaner-macOS
 chmod +x maintenance.sh
 ./maintenance.sh
 ```
@@ -204,13 +204,13 @@ clean_your_tool() {
 Log files are automatically created with timestamp:
 
 ```
-~/macos_maintenance_YYYYMMDD_HHMMSS.log
+~/dev_cleaner_macOS_YYYYMMDD_HHMMSS.log
 ```
 
 View the log from the menu (option 16) or manually:
 
 ```bash
-cat ~/macos_maintenance_*.log
+cat ~/dev_cleaner_macOS_*.log
 ```
 
 ## Space Savings

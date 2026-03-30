@@ -24,7 +24,7 @@ source "$LIB_DIR/expo-clean.sh"
 source "$LIB_DIR/devtools-clean.sh"
 source "$LIB_DIR/assets-clean.sh"
 
-LOG_FILE="$HOME/macos_maintenance_$(date +%Y%m%d_%H%M%S).log"
+LOG_FILE="$HOME/dev_cleaner_macOS_$(date +%Y%m%d_%H%M%S).log"
 TOTAL_CLEANED=0
 
 # ============================================
@@ -34,28 +34,28 @@ TOTAL_CLEANED=0
 show_menu() {
     clear
     print_header
-    echo -e "${YELLOW}Current free space: $(get_disk_usage)${NC}"
+    echo -e "  ${PURPLE}Available Options:${NC}"
     echo ""
-    echo "1)  Run complete maintenance"
-    echo "2)  Update system and Homebrew"
-    echo "3)  Clean update cache"
-    echo "4)  Clean system (caches, logs, Xcode, DNS)"
-    echo "5)  Clean system assets (AssetsV2, iCloud, Spotlight)"
-    echo "6)  Optimize storage"
-    echo "7)  Clean iOS simulator"
-    echo "8)  Clean iOS firmwares (IPSW)"
-    echo "9)  Clean Android Studio & Emulator"
-    echo "10) Clean Node.js (NPM, PNPM, Bun, Yarn, Volta, Turbo)"
-    echo "11) Clean Flutter / Dart / FVM"
-    echo "12) Clean Expo & React Native"
-    echo "13) Clean dev tools (Homebrew, CocoaPods, Ruby, Python)"
-    echo "14) Clean Docker"
-    echo "15) Clean CrossOver cache"
-    echo "16) View action log"
-    echo "17) Restart macOS"
-    echo "0)  Exit"
+    echo -e "  ${GREEN}1)${NC}  Run complete maintenance"
+    echo -e "  ${GREEN}2)${NC}  Update system and Homebrew"
+    echo -e "  ${GREEN}3)${NC}  Clean update cache"
+    echo -e "  ${GREEN}4)${NC}  Clean system (caches, logs, Xcode, DNS)"
+    echo -e "  ${GREEN}5)${NC}  Clean system assets (AssetsV2, iCloud, Spotlight)"
+    echo -e "  ${GREEN}6)${NC}  Optimize storage"
+    echo -e "  ${GREEN}7)${NC}  Clean iOS simulator"
+    echo -e "  ${GREEN}8)${NC}  Clean iOS firmwares (IPSW)"
+    echo -e "  ${GREEN}9)${NC}  Clean Android Studio & Emulator"
+    echo -e "  ${GREEN}10)${NC} Clean Node.js (NPM, PNPM, Bun, Yarn, Volta, Turbo)"
+    echo -e "  ${GREEN}11)${NC} Clean Flutter / Dart / FVM"
+    echo -e "  ${GREEN}12)${NC} Clean Expo & React Native"
+    echo -e "  ${GREEN}13)${NC} Clean dev tools (Homebrew, CocoaPods, Ruby, Python)"
+    echo -e "  ${GREEN}14)${NC} Clean Docker"
+    echo -e "  ${GREEN}15)${NC} Clean CrossOver cache"
+    echo -e "  ${GREEN}16)${NC} View action log"
+    echo -e "  ${GREEN}17)${NC} Restart macOS"
+    echo -e "  ${GREEN}0)${NC}  Exit"
     echo ""
-    echo -n "Choose an option: "
+    echo -ne "  ${CYAN}→ Choose an option: ${NC}"
 }
 
 run_full_maintenance() {
