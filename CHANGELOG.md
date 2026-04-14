@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/Victor-Zarzar/dev-cleaner-macOS/compare/v1.1.0...v1.2.0) (2026-04-14)
+
+
+### Features
+
+* add new apps, browser ides clean. ([70008fb](https://github.com/Victor-Zarzar/dev-cleaner-macOS/commit/70008fbf2257f2489c2a7bf632c1c13975e21c98))
+* add new functions. ([7f1a899](https://github.com/Victor-Zarzar/dev-cleaner-macOS/commit/7f1a8993ce8dcdc32da694d323876bc031c05825))
+
 ## [1.1.0](https://github.com/Victor-Zarzar/dev-cleaner-macOS/compare/v1.0.0...v1.1.0) (2026-03-30)
 
 
