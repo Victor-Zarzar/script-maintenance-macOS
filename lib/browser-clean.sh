@@ -21,7 +21,6 @@ cleanup_browser_caches() {
         print_warning "Safari cache not found. Skipping."
     fi
 
-    # ── Chrome ──────────────────────────────
     local chrome_base="$HOME/Library/Application Support/Google/Chrome"
     if [ -d "$chrome_base" ]; then
         local size=0

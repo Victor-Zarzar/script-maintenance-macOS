@@ -25,6 +25,9 @@ A comprehensive, modular automated maintenance script for macOS that helps clean
 - **Docker Cleanup**: Remove unused containers, images, and volumes
 - **Time Machine Snapshot Management**: Remove local snapshots
 - **CrossOver Cleaning**: Clean CrossOver Wine bottles & caches
+- **Browser Cache Cleaning**: Remove caches from Chrome, Orion, Safari
+- **IDE Cache Cleaning**: Remove caches from JetBrains IDEs, VSCode, and Zed Editor
+- **App Cache Cleaning**: Remove caches from Slack, Discord, Spotify, and other apps
 - **DNS Cache Flush**: Reset DNS with `dscacheutil` + `mDNSResponder`
 - **System Restart**: Safe restart option with countdown timer
 - **Automatic Log Generation**: Detailed maintenance logs with timestamps
@@ -55,6 +58,9 @@ dev-cleaner-macos/
 │   ├── devtools-clean.sh   # Homebrew, CocoaPods, Ruby, Python
 │   ├── assets-clean.sh     # AssetsV2, iWork templates, iCloud, Spotlight
 │   ├── storage-optimize.sh # Storage optimization
+│   ├── browser-clean.sh    # Browser caches (Chrome, Safari, Orion)
+│   ├── ide-clean.sh        # IDE caches (JetBrains, VSCode, Zed Editor)
+│   ├── apps-clean.sh       # App caches (Slack, Discord, Spotify, and others)
 │   └── restart-macos.sh    # System restart function
 └── README.md               # This file
 ```
@@ -86,8 +92,11 @@ The script will display an interactive menu with the following options:
 13) Clean dev tools (Homebrew, CocoaPods, Ruby, Python)
 14) Clean Docker
 15) Clean CrossOver cache
-16) View action log
-17) Restart macOS
+16) Clean browser caches
+17) Clean IDE caches (JetBrains, VSCode, Zed Editor)
+18) Clean app caches (Slack, Discord, Spotify...)
+19) View action log
+20) Restart macOS
 0)  Exit
 ```
 
@@ -132,6 +141,25 @@ The script will display an interactive menu with the following options:
 - **Turbo**: Global `~/.turbo` cache + project caches (with confirmation)
 - **Orphan node_modules**: Scans `~/Projects` for `node_modules` older than 30 days (with confirmation)
 
+### Browsers
+
+- **Google Chrome**: Profile caches, GPUCache, Code Cache, and media cache
+- **Orion Browser**: Browser cache and offline data
+- **Safari**: Cache database and browser cache directories
+
+### IDEs
+
+- **JetBrains IDEs**: Caches for IntelliJ IDEA, WebStorm, Android Studio, PyCharm, GoLand, CLion, DataGrip, RubyMine, and Rider
+- **Visual Studio Code**: Cache, CachedData, CachedExtensions, and Code Cache
+- **Zed Editor**: Cache directory
+
+### Apps
+
+- **Slack**: Application cache and service worker data
+- **Discord**: Cache, Code Cache, and GPUCache
+- **Spotify**: Browser cache, data, and offline storage
+- **Other apps**: Generic user `~/Library/Caches` cleanup for remaining applications
+
 ### Package Managers
 
 - **Gradle**: Full cache removal with wrapper optimization
@@ -155,12 +183,15 @@ The script includes a safe system restart option:
 
 Functions are grouped into entrypoints for convenience in `run_full_maintenance()` and the menu:
 
-| Entrypoint              | Includes                                                               |
-| ----------------------- | ---------------------------------------------------------------------- |
-| `clean_system_clean`    | system caches, downloads, logs, Xcode DerivedData, app containers, DNS |
-| `clean_system_assets`   | AssetsV2, Xcode templates, iCloud cache, Spotlight                     |
-| `clean_system_nodejs`   | NPM, PNPM, Bun, Yarn, Volta, Turbo, node_modules                       |
-| `clean_system_devtools` | Homebrew, CocoaPods, Ruby, Python                                      |
+| Entrypoint               | Includes                                                               |
+| ------------------------ | ---------------------------------------------------------------------- |
+| `clean_system_clean`     | system caches, downloads, logs, Xcode DerivedData, app containers, DNS |
+| `clean_system_assets`    | AssetsV2, Xcode templates, iCloud cache, Spotlight                     |
+| `clean_system_nodejs`    | NPM, PNPM, Bun, Yarn, Volta, Turbo, node_modules                       |
+| `clean_system_devtools`  | Homebrew, CocoaPods, Ruby, Python                                      |
+| `cleanup_browser_caches` | Chrome, Firefox, Safari, Brave, Arc, Edge                              |
+| `cleanup_ide_caches`     | JetBrains IDEs, VSCode, Zed Editor                                     |
+| `cleanup_app_caches`     | Slack, Discord, Spotify, and other app caches                          |
 
 ## Customization
 
@@ -213,7 +244,7 @@ Log files are automatically created with timestamp:
 ~/dev_cleaner_macOS_YYYYMMDD_HHMMSS.log
 ```
 
-View the log from the menu (option 16) or manually:
+View the log from the menu (option 19) or manually:
 
 ```bash
 cat ~/dev_cleaner_macOS_*.log
@@ -223,18 +254,21 @@ cat ~/dev_cleaner_macOS_*.log
 
 Typical space savings after running full maintenance:
 
-| Area                                | Savings          |
-| ----------------------------------- | ---------------- |
-| Xcode DerivedData & caches          | 5–20 GB          |
-| iOS Simulator                       | 1–5 GB           |
-| Android Studio & Gradle             | 5–8 GB           |
-| iOS Firmwares (IPSW)                | 3–11 GB per file |
-| System caches & logs                | 500 MB – 5 GB    |
-| Docker                              | 1–10 GB          |
-| Node.js ecosystem                   | 500 MB – 3 GB    |
-| AssetsV2 / iWork templates          | ~800 MB          |
-| Dev tools (Ruby, Python, CocoaPods) | 500 MB – 2 GB    |
-| **Total**                           | **15–65+ GB**    |
+| Area                                 | Savings          |
+| ------------------------------------ | ---------------- |
+| Xcode DerivedData & caches           | 5–20 GB          |
+| iOS Simulator                        | 1–5 GB           |
+| Android Studio & Gradle              | 5–8 GB           |
+| iOS Firmwares (IPSW)                 | 3–11 GB per file |
+| System caches & logs                 | 500 MB – 5 GB    |
+| Docker                               | 1–10 GB          |
+| Node.js ecosystem                    | 500 MB – 3 GB    |
+| AssetsV2 / iWork templates           | ~800 MB          |
+| Dev tools (Ruby, Python, CocoaPods)  | 500 MB – 2 GB    |
+| Browser caches                       | 200 MB – 2 GB    |
+| IDE caches (JetBrains, VSCode, Zed)  | 500 MB – 3 GB    |
+| App caches (Slack, Discord, Spotify) | 200 MB – 1 GB    |
+| **Total**                            | **15–70+ GB**    |
 
 ## Tips
 
@@ -243,7 +277,7 @@ Typical space savings after running full maintenance:
 - Check the log file if any cleaning fails
 - Some operations may require administrator password
 - Gradle cache will be automatically rebuilt on next build
-- Use option **17** to safely restart your Mac after maintenance
+- Use option **20** to safely restart your Mac after maintenance
 - System restart recommended after full maintenance
 
 ## Troubleshooting
@@ -264,10 +298,12 @@ If you encounter issues:
 
 **Restart requires sudo:** System restart operation requires administrator privileges.
 
+**Browser/App caches:** Apps should be closed before cleaning their caches to avoid conflicts.
+
 **View detailed errors:**
 
 ```bash
-cat ~/macos_maintenance_*.log
+cat ~/dev_cleaner_macOS_*.log
 ```
 
 ## Advantages of Modular Architecture
