@@ -23,6 +23,9 @@ source "$LIB_DIR/crossover-clean.sh"
 source "$LIB_DIR/expo-clean.sh"
 source "$LIB_DIR/devtools-clean.sh"
 source "$LIB_DIR/assets-clean.sh"
+source "$LIB_DIR/browser-clean.sh"
+source "$LIB_DIR/ide-clean.sh"
+source "$LIB_DIR/apps-clean.sh"
 
 LOG_FILE="$HOME/dev_cleaner_macOS_$(date +%Y%m%d_%H%M%S).log"
 TOTAL_CLEANED=0
@@ -51,8 +54,11 @@ show_menu() {
     echo -e "  ${GREEN}13)${NC} Clean dev tools (Homebrew, CocoaPods, Ruby, Python)"
     echo -e "  ${GREEN}14)${NC} Clean Docker"
     echo -e "  ${GREEN}15)${NC} Clean CrossOver cache"
-    echo -e "  ${GREEN}16)${NC} View action log"
-    echo -e "  ${GREEN}17)${NC} Restart macOS"
+    echo -e "  ${GREEN}16)${NC} Clean browser caches"
+    echo -e "  ${GREEN}17)${NC} Clean IDE caches (JetBrains, VSCode, Zed Editor)"
+    echo -e "  ${GREEN}18)${NC} Clean app caches (Slack, Discord, Spotify...)"
+    echo -e "  ${GREEN}19)${NC} View action log"
+    echo -e "  ${GREEN}20)${NC} Restart macOS"
     echo -e "  ${GREEN}0)${NC}  Exit"
     echo ""
     echo -ne "  ${CYAN}→ Choose an option: ${NC}"
@@ -78,6 +84,9 @@ run_full_maintenance() {
     optimize_storage
     clean_docker
     clean_crossover
+    cleanup_browser_caches
+    cleanup_ide_caches
+    cleanup_app_caches
     restart_macos
 
     local final_space=$(get_disk_usage)
@@ -127,8 +136,11 @@ main() {
             13) clean_system_devtools ;;
             14) clean_docker ;;
             15) clean_crossover ;;
-            16) cat "$LOG_FILE" | less ;;
-            17) restart_macos ;;
+            16) cleanup_browser_caches ;;
+            17) cleanup_ide_caches ;;
+            18) cleanup_app_caches ;;
+            19) cat "$LOG_FILE" | less ;;
+            20) restart_macos ;;
             0)
                 print_success "Goodbye!"
                 log_action "Script finished"
